@@ -12,105 +12,105 @@
     - curl 
     - gnupg
 
-# # - name: Ensure /etc/apt/keyrings exists
-# #   ansible.builtin.file:
-# #     path: /etc/apt/keyrings
-# #     state: directory
-# #     mode: '0755'
+- name: Ensure /etc/apt/keyrings exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
 
-# # - name: Download Docker GPG key
-# #   get_url:
-# #     url: https://download.docker.com/linux/debian/gpg
-# #     dest: /tmp/docker.gpg
+- name: Download Docker GPG key
+  get_url:
+    url: https://download.docker.com/linux/debian/gpg
+    dest: /tmp/docker.gpg
 
-# # - name: Load Docker GPG key
-# #   command:
-# #     cmd: gpg --dearmor -o /etc/apt/keyrings/docker.gpg /tmp/docker.gpg
-# #     creates: /etc/apt/keyrings/docker.gpg
+- name: Load Docker GPG key
+  command:
+    cmd: gpg --dearmor -o /etc/apt/keyrings/docker.gpg /tmp/docker.gpg
+    creates: /etc/apt/keyrings/docker.gpg
 
-# # - name: Set permission for Docker GPG key
-# #   ansible.builtin.file:
-# #     path: /etc/apt/keyrings/docker.gpg
-# #     mode: '0644'
+- name: Set permission for Docker GPG key
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/docker.gpg
+    mode: '0644'
 
-# # - name: Get debian codename
-# #   command:
-# #     cmd: bash -c ". /etc/os-release && echo $VERSION_CODENAME"
-# #   register: debian_codename
+- name: Get debian codename
+  command:
+    cmd: bash -c ". /etc/os-release && echo $VERSION_CODENAME"
+  register: debian_codename
 
 
-# # - name: Add Docker repository
-# #   ansible.builtin.apt_repository:
-# #     repo: "deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ debian_codename.stdout }} stable"
-# #     state: present
-# #     filename: docker
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ debian_codename.stdout }} stable"
+    state: present
+    filename: docker
 
-# # - name: Update packages
-# #   apt:
-# #     update_cache: yes
+- name: Update packages
+  apt:
+    update_cache: yes
 
-# # - name: Install Docker dependencies
-# #   apt:
-# #     name: "{{ item }}"  
-# #     state: present  
-# #   loop:
-# #     - docker-ce
-# #     - docker-ce-cli
-# #     - containerd.io
-# #     - docker-buildx-plugin
-# #     - docker-compose-plugin
-# # - name: Install apt-transport-https
-# #   apt:
-# #     name: apt-transport-https
-# #     state: present
+- name: Install Docker dependencies
+  apt:
+    name: "{{ item }}"  
+    state: present  
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+- name: Install apt-transport-https
+  apt:
+    name: apt-transport-https
+    state: present
 
-# # - name: Add Kubernetes apt-key
-# #   apt_key:
-# #     url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
-# #     state: present
+- name: Add Kubernetes apt-key
+  apt_key:
+    url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+    state: present
 
-# # - name: Add Kubernetes apt repository list
-# #   apt_repository:
-# #     repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
-# #     state: present
+- name: Add Kubernetes apt repository list
+  apt_repository:
+    repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+    state: present
 
-# # - name: Install Kubernetes components
-# #   apt:
-# #     name: "{{ item }}"
-# #     state: present
-# #   loop:
-# #     - kubelet
-# #     - kubeadm
-# #     - kubectl
+- name: Install Kubernetes components
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
 
-# # - name: Start and Enable Docker and Kubernetes services
-# #   systemd:
-# #     name: "{{ item }}"
-# #     state: started
-# #     enabled: yes
-# #   loop:
-# #     - docker
-# #     - kubelet
+- name: Start and Enable Docker and Kubernetes services
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - docker
+    - kubelet
 
-# # - name: Disable swap
-# #   command: swapoff -a
+- name: Disable swap
+  command: swapoff -a
 
-# # - name: Remove swapfile from /etc/fstab
-# #   replace:
-# #     path: /etc/fstab
-# #     regexp: '^(.*swap.*)$'
-# #     replace: '#\1'
+- name: Remove swapfile from /etc/fstab
+  replace:
+    path: /etc/fstab
+    regexp: '^(.*swap.*)$'
+    replace: '#\1'
 
-# # - name: Install UFW
-# #   apt:
-# #     name: ufw
-# #     state: present
-# #     update_cache: yes
+- name: Install UFW
+  apt:
+    name: ufw
+    state: present
+    update_cache: yes
 
-# # - name: Enable UFW
-# #   command: ufw enable
-# #   register: ufw_enable_result
-# #   failed_when: ufw_enable_result.rc != 0 and "Firewall is active and enabled on system startup" not in ufw_enable_result.stdout
+- name: Enable UFW
+  command: ufw enable
+  register: ufw_enable_result
+  failed_when: ufw_enable_result.rc != 0 and "Firewall is active and enabled on system startup" not in ufw_enable_result.stdout
 
 # - name: Allow SSH through UFW
 #   ufw:
