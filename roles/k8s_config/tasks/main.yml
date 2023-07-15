@@ -112,61 +112,61 @@
   register: ufw_enable_result
   failed_when: ufw_enable_result.rc != 0 and "Firewall is active and enabled on system startup" not in ufw_enable_result.stdout
 
-# - name: Allow SSH through UFW
-#   ufw:
-#     rule: allow
-#     port: '22'
-#     proto: tcp
+- name: Allow SSH through UFW
+  ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
 
-# - name: Open necessary ports for Kubernetes Nodes
-#   ufw:
-#     rule: allow
-#     port: '{{ item }}'
-#     proto: tcp
-#   with_items:
-#     - '6443'        # Kubernetes API server
-#     - '2379:2380'   # etcd server client API
-#     - '10250'       # Kubelet API
-#     - '10251'       # kube-scheduler
-#     - '10252'       # kube-controller-manager
-#     - '10255'       # Read-Only Kubelet API (Heapster)
-#     - '30000:32767' # NodePort Services
+- name: Open necessary ports for Kubernetes Nodes
+  ufw:
+    rule: allow
+    port: '{{ item }}'
+    proto: tcp
+  with_items:
+    - '6443'        
+    - '2379:2380'   
+    - '10250'       
+    - '10251'       
+    - '10252'       
+    - '10255'       
+    - '30000:32767' 
 
-# - name: Check if Kubernetes is already initialized
-#   shell: kubectl get nodes
-#   register: kubeadm_init_check
-#   ignore_errors: yes
+- name: Check if Kubernetes is already initialized
+  shell: kubectl get nodes
+  register: kubeadm_init_check
+  ignore_errors: yes
 
-# - name: Initialize the Kubernetes cluster
-#   command: kubeadm init --pod-network-cidr=10.244.0.0/16
-#   ignore_errors: yes
-#   when: kubeadm_init_check.rc != 0
+- name: Initialize the Kubernetes cluster
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16
+  ignore_errors: yes
+  when: kubeadm_init_check.rc != 0
 
-# - name: Ensure .kube directory exists for user
-#   file: 
-#     path: /home/1234/.kube
-#     state: directory
-#     mode: 0755
-#     owner: "1234"
-#     group: "1234"
+- name: Ensure .kube directory exists for user
+  file: 
+    path: /home/1234/.kube
+    state: directory
+    mode: 0755
+    owner: "1234"
+    group: "1234"
 
 
 
-# - name: Copy kube config file to user's home
-#   command: cp /etc/kubernetes/admin.conf /home/1234/.kube/config
-#   ignore_errors: yes
+- name: Copy kube config file to user's home
+  command: cp /etc/kubernetes/admin.conf /home/1234/.kube/config
+  ignore_errors: yes
 
-# - name: Ensure .kube/config file has right permissions
-#   file: 
-#     path: /home/1234/.kube/config
-#     state: file
-#     mode: 0600
-#     owner: "1234"
-#     group: "1234"
+- name: Ensure .kube/config file has right permissions
+  file: 
+    path: /home/1234/.kube/config
+    state: file
+    mode: 0600
+    owner: "1234"
+    group: "1234"
 
-# - name: Apply Flannel CNI
-#   command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-#   ignore_errors: yes
+- name: Apply Flannel CNI
+  command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  ignore_errors: yes
 
 - name:  Apply Flannel
   debug: 
