@@ -1,0 +1,86 @@
+---
+- name: Deploy MySQL
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: mysql-pvc
+        namespace: "{{ namespace }}"
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+            
+- name: Deploy MySQL
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: mysql
+        namespace: "{{ namespace }}"
+        labels:
+          app: mysql
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: mysql
+        template:
+          metadata:
+            labels:
+              app: mysql
+          spec:
+            containers:
+            - name: mysql
+              image: mysql:5.6
+              env:
+              - name: MYSQL_ROOT_PASSWORD
+                value: password
+              ports:
+              - containerPort: 3306
+              volumeMounts:
+              - name: mysql-storage
+                mountPath: /var/lib/mysql
+            volumes:
+            - name: mysql-storage
+              persistentVolumeClaim:
+                claimName: mysql-pvc
+
+# Deploy "Todo" Application
+- name: Deploy "Todo" application
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      # Your application definition goes here
+
+# Expose the "Todo" Application
+- name: Expose the "Todo" application
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: todoapp-ingress
+        namespace: "{{ namespace }}"
+        labels:
+          app: todoapp
+      spec:
+        rules:
+        - host: my-app.com
+          http:
+            paths:
+            - pathType: Prefix
+              path: "/"
+              backend:
+                service:
+                  name: todoapp
+                  port:
+                    number: 80
+

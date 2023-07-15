@@ -1,0 +1,173 @@
+---
+- name: Update packages
+  apt:
+    update_cache: yes
+
+- name: Install Docker dependencies
+  apt:
+    name: "{{ item }}"  
+    state: present  
+  loop:
+    - ca-certificates 
+    - curl 
+    - gnupg
+
+# # - name: Ensure /etc/apt/keyrings exists
+# #   ansible.builtin.file:
+# #     path: /etc/apt/keyrings
+# #     state: directory
+# #     mode: '0755'
+
+# # - name: Download Docker GPG key
+# #   get_url:
+# #     url: https://download.docker.com/linux/debian/gpg
+# #     dest: /tmp/docker.gpg
+
+# # - name: Load Docker GPG key
+# #   command:
+# #     cmd: gpg --dearmor -o /etc/apt/keyrings/docker.gpg /tmp/docker.gpg
+# #     creates: /etc/apt/keyrings/docker.gpg
+
+# # - name: Set permission for Docker GPG key
+# #   ansible.builtin.file:
+# #     path: /etc/apt/keyrings/docker.gpg
+# #     mode: '0644'
+
+# # - name: Get debian codename
+# #   command:
+# #     cmd: bash -c ". /etc/os-release && echo $VERSION_CODENAME"
+# #   register: debian_codename
+
+
+# # - name: Add Docker repository
+# #   ansible.builtin.apt_repository:
+# #     repo: "deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ debian_codename.stdout }} stable"
+# #     state: present
+# #     filename: docker
+
+# # - name: Update packages
+# #   apt:
+# #     update_cache: yes
+
+# # - name: Install Docker dependencies
+# #   apt:
+# #     name: "{{ item }}"  
+# #     state: present  
+# #   loop:
+# #     - docker-ce
+# #     - docker-ce-cli
+# #     - containerd.io
+# #     - docker-buildx-plugin
+# #     - docker-compose-plugin
+# # - name: Install apt-transport-https
+# #   apt:
+# #     name: apt-transport-https
+# #     state: present
+
+# # - name: Add Kubernetes apt-key
+# #   apt_key:
+# #     url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+# #     state: present
+
+# # - name: Add Kubernetes apt repository list
+# #   apt_repository:
+# #     repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+# #     state: present
+
+# # - name: Install Kubernetes components
+# #   apt:
+# #     name: "{{ item }}"
+# #     state: present
+# #   loop:
+# #     - kubelet
+# #     - kubeadm
+# #     - kubectl
+
+# # - name: Start and Enable Docker and Kubernetes services
+# #   systemd:
+# #     name: "{{ item }}"
+# #     state: started
+# #     enabled: yes
+# #   loop:
+# #     - docker
+# #     - kubelet
+
+# # - name: Disable swap
+# #   command: swapoff -a
+
+# # - name: Remove swapfile from /etc/fstab
+# #   replace:
+# #     path: /etc/fstab
+# #     regexp: '^(.*swap.*)$'
+# #     replace: '#\1'
+
+# # - name: Install UFW
+# #   apt:
+# #     name: ufw
+# #     state: present
+# #     update_cache: yes
+
+# # - name: Enable UFW
+# #   command: ufw enable
+# #   register: ufw_enable_result
+# #   failed_when: ufw_enable_result.rc != 0 and "Firewall is active and enabled on system startup" not in ufw_enable_result.stdout
+
+# - name: Allow SSH through UFW
+#   ufw:
+#     rule: allow
+#     port: '22'
+#     proto: tcp
+
+# - name: Open necessary ports for Kubernetes Nodes
+#   ufw:
+#     rule: allow
+#     port: '{{ item }}'
+#     proto: tcp
+#   with_items:
+#     - '6443'        # Kubernetes API server
+#     - '2379:2380'   # etcd server client API
+#     - '10250'       # Kubelet API
+#     - '10251'       # kube-scheduler
+#     - '10252'       # kube-controller-manager
+#     - '10255'       # Read-Only Kubelet API (Heapster)
+#     - '30000:32767' # NodePort Services
+
+# - name: Check if Kubernetes is already initialized
+#   shell: kubectl get nodes
+#   register: kubeadm_init_check
+#   ignore_errors: yes
+
+# - name: Initialize the Kubernetes cluster
+#   command: kubeadm init --pod-network-cidr=10.244.0.0/16
+#   ignore_errors: yes
+#   when: kubeadm_init_check.rc != 0
+
+# - name: Ensure .kube directory exists for user
+#   file: 
+#     path: /home/1234/.kube
+#     state: directory
+#     mode: 0755
+#     owner: "1234"
+#     group: "1234"
+
+
+
+# - name: Copy kube config file to user's home
+#   command: cp /etc/kubernetes/admin.conf /home/1234/.kube/config
+#   ignore_errors: yes
+
+# - name: Ensure .kube/config file has right permissions
+#   file: 
+#     path: /home/1234/.kube/config
+#     state: file
+#     mode: 0600
+#     owner: "1234"
+#     group: "1234"
+
+# - name: Apply Flannel CNI
+#   command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+#   ignore_errors: yes
+
+- name:  Apply Flannel
+  debug: 
+    msg: "{{namespace}}"

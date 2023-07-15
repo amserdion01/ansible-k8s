@@ -1,0 +1,8 @@
+all:
+  children:
+    target_vm:
+      hosts:
+        34.135.81.218:
+      vars:
+        namespace: main
+        

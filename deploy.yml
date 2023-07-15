@@ -1,0 +1,6 @@
+- hosts: target_vm
+  gather_facts: false
+  become: true
+  roles:
+#    - role: 'k8s_config'
+     - role: 'k8s_deploy'
